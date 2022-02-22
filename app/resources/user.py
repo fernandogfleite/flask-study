@@ -1,3 +1,4 @@
+from app.schemas.user import UserSchema
 from app.util import status
 from app.models.user import UserModel
 
@@ -23,6 +24,7 @@ class User(Resource):
     )
 
     def post(self):
+        user_shema = UserSchema()
         data = User.parser.parse_args()
 
         if UserModel.find_by_username(data['username']):
@@ -33,11 +35,16 @@ class User(Resource):
         user = UserModel(**data)
         user.save_to_db()
 
-        return user.serialize, status.HTTP_201_CREATED
+        data = user_shema.dump(user)
+
+        return data, status.HTTP_201_CREATED
 
     def get(self):
+        users_shema = UserSchema(many=True)
         users = [
             user.serialize for user in UserModel.all()
         ]
 
-        return users, status.HTTP_200_OK
+        data = users_shema.dump(users)
+
+        return data, status.HTTP_200_OK
