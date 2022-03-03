@@ -5,9 +5,11 @@ from flask_restful import Api
 
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from flask_jwt_extended import JWTManager
 
 db = SQLAlchemy()
 ma = Marshmallow()
+jwt = JWTManager()
 
 
 def init_app():
@@ -23,10 +25,12 @@ def init_app():
 
     db.init_app(app)
     ma.init_app(app)
+    jwt.init_app(app)
 
     with app.app_context():
-        from app.resources.user import User
+        from app.resources.user import User, Login
         api.add_resource(User, '/users')
+        api.add_resource(Login, '/login')
         db.create_all()
 
         return app
