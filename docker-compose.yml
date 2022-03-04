@@ -1,0 +1,22 @@
+version: '3.10'
+services:
+  server:
+    build:
+      context: .
+    volumes:
+      - ./app/:/app/
+    command: > 
+      sh -c "flask db upgrade &&
+             flask run"
+    env_file:
+      - .env
+    ports:
+      - 5000:5000
+    
+    depends_on:
+      - db
+
+  db:
+    image: postgres:14-alpine
+    env_file:
+      - .env
