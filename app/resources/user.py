@@ -54,21 +54,17 @@ class User(Resource):
         user = UserModel(**data)
         user.save_to_db()
 
-        data = user_shema.dump(user)
+        user_data = user_shema.dump(user)
 
-        return data, status.HTTP_201_CREATED
+        return user_data, status.HTTP_201_CREATED
 
     @jwt_required()
     def get(self):
-        print(current_user)
-        users_shema = UserSchema(many=True)
-        users = [
-            user.serialize for user in UserModel.all()
-        ]
+        user_shema = UserSchema()
 
-        data = users_shema.dump(users)
+        user_data = user_shema.dump(current_user)
 
-        return data, status.HTTP_200_OK
+        return user_data, status.HTTP_200_OK
 
 
 class Login(Resource):
@@ -87,7 +83,7 @@ class Login(Resource):
     )
 
     def post(self):
-        data = User.parser.parse_args()
+        data = Login.parser.parse_args()
         username = data['username']
         password = data['password']
 
@@ -96,5 +92,6 @@ class Login(Resource):
             return {
                 'message': 'Wrong username or password.'
             }, status.HTTP_401_UNAUTHORIZED
+
         access_token = create_access_token(identity=user)
         return jsonify(access_token=access_token)

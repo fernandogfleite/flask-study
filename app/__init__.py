@@ -6,10 +6,12 @@ from flask_restful import Api
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
 from flask_jwt_extended import JWTManager
+from flask_migrate import Migrate
 
 db = SQLAlchemy()
 ma = Marshmallow()
 jwt = JWTManager()
+migrate = Migrate()
 
 
 def init_app():
@@ -24,6 +26,7 @@ def init_app():
     api = Api(app)
 
     db.init_app(app)
+    migrate.init_app(app, db)
     ma.init_app(app)
     jwt.init_app(app)
 
@@ -31,6 +34,5 @@ def init_app():
         from app.resources.user import User, Login
         api.add_resource(User, '/users')
         api.add_resource(Login, '/login')
-        db.create_all()
 
         return app
